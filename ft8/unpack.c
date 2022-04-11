@@ -1,16 +1,21 @@
-#include <stdio.h> //added by AA1GD aug 22 '21
+#ifdef __linux__
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#endif
+
 #include "unpack.h"
 #include "text.h"
 
 #include <string.h>
 
-#define MAX22 ((uint32_t)4194304L)
-#define NTOKENS ((uint32_t)2063592L)
+#define MAX22    ((uint32_t)4194304L)
+#define NTOKENS  ((uint32_t)2063592L)
 #define MAXGRID4 ((uint16_t)32400L)
 
 // n28 is a 28-bit integer, e.g. n28a or n28b, containing all the
 // call sign bits from a packed message.
-int unpack_callsign(uint32_t n28, uint8_t ip, uint8_t i3, char *result)
+int unpack_callsign(uint32_t n28, uint8_t ip, uint8_t i3, char* result)
 {
     // Check for special tokens DE, QRZ, CQ, CQ_nnn, CQ_aaaa
     if (n28 < NTOKENS)
@@ -106,7 +111,7 @@ int unpack_callsign(uint32_t n28, uint8_t ip, uint8_t i3, char *result)
     return 0; // Success
 }
 
-int unpack_type1(const uint8_t *a77, uint8_t i3, char *call_to, char *call_de, char *extra)
+int unpack_type1(const uint8_t* a77, uint8_t i3, char* call_to, char* call_de, char* extra)
 {
     uint32_t n28a, n28b;
     uint16_t igrid4;
@@ -146,7 +151,7 @@ int unpack_type1(const uint8_t *a77, uint8_t i3, char *call_to, char *call_de, c
     //     save_hash_call(call_de)
     // }
 
-    char *dst = extra;
+    char* dst = extra;
 
     if (igrid4 <= MAXGRID4)
     {
@@ -154,10 +159,7 @@ int unpack_type1(const uint8_t *a77, uint8_t i3, char *call_to, char *call_de, c
         if (ir > 0)
         {
             // In case of ir=1 add an "R" before grid
-            dst = strcpy(dst, "R ");
-            int dstLength1 = strlen(dst);
-            dst = dst + dstLength1; //can't sure stpcpy so need to find location of null terminator
-            //printf("line 156 strcpy instead of stpcpy");
+            dst = stpcpy(dst, "R ");
         }
 
         uint16_t n = igrid4;
@@ -206,7 +208,7 @@ int unpack_type1(const uint8_t *a77, uint8_t i3, char *call_to, char *call_de, c
     return 0; // Success
 }
 
-int unpack_text(const uint8_t *a71, char *text)
+int unpack_text(const uint8_t* a71, char* text)
 {
     // TODO: test
     uint8_t b71[9];
@@ -238,7 +240,7 @@ int unpack_text(const uint8_t *a71, char *text)
     return 0; // Success
 }
 
-int unpack_telemetry(const uint8_t *a71, char *telemetry)
+int unpack_telemetry(const uint8_t* a71, char* telemetry)
 {
     uint8_t b71[9];
 
@@ -267,21 +269,21 @@ int unpack_telemetry(const uint8_t *a71, char *telemetry)
 
 //none standard for wsjt-x 2.0
 //by KD8CEC
-int unpack_nonstandard(const uint8_t *a77, char *call_to, char *call_de, char *extra)
+int unpack_nonstandard(const uint8_t* a77, char* call_to, char* call_de, char* extra)
 {
     uint32_t n12, iflip, nrpt, icq;
     uint64_t n58;
-    n12 = (a77[0] << 4);  //11 ~4  : 8
+    n12 = (a77[0] << 4); //11 ~4  : 8
     n12 |= (a77[1] >> 4); //3~0 : 12
 
     n58 = ((uint64_t)(a77[1] & 0x0F) << 54); //57 ~ 54 : 4
-    n58 |= ((uint64_t)a77[2] << 46);         //53 ~ 46 : 12
-    n58 |= ((uint64_t)a77[3] << 38);         //45 ~ 38 : 12
-    n58 |= ((uint64_t)a77[4] << 30);         //37 ~ 30 : 12
-    n58 |= ((uint64_t)a77[5] << 22);         //29 ~ 22 : 12
-    n58 |= ((uint64_t)a77[6] << 14);         //21 ~ 14 : 12
-    n58 |= ((uint64_t)a77[7] << 6);          //13 ~ 6 : 12
-    n58 |= ((uint64_t)a77[8] >> 2);          //5 ~ 0 : 765432 10
+    n58 |= ((uint64_t)a77[2] << 46); //53 ~ 46 : 12
+    n58 |= ((uint64_t)a77[3] << 38); //45 ~ 38 : 12
+    n58 |= ((uint64_t)a77[4] << 30); //37 ~ 30 : 12
+    n58 |= ((uint64_t)a77[5] << 22); //29 ~ 22 : 12
+    n58 |= ((uint64_t)a77[6] << 14); //21 ~ 14 : 12
+    n58 |= ((uint64_t)a77[7] << 6); //13 ~ 6 : 12
+    n58 |= ((uint64_t)a77[8] >> 2); //5 ~ 0 : 765432 10
 
     iflip = (a77[8] >> 1) & 0x01; //76543210
     nrpt = ((a77[8] & 0x01) << 1);
@@ -307,8 +309,8 @@ int unpack_nonstandard(const uint8_t *a77, char *call_to, char *call_de, char *e
     // call_3[5] = '>';
     // call_3[6] = '\0';
 
-    char *call_1 = (iflip) ? c11 : call_3;
-    char *call_2 = (iflip) ? call_3 : c11;
+    char* call_1 = (iflip) ? c11 : call_3;
+    char* call_2 = (iflip) ? call_3 : c11;
     //save_hash_call(c11_trimmed);
 
     if (icq == 0)
@@ -335,7 +337,7 @@ int unpack_nonstandard(const uint8_t *a77, char *call_to, char *call_de, char *e
     return 0;
 }
 
-int unpack77_fields(const uint8_t *a77, char *call_to, char *call_de, char *extra)
+int unpack77_fields(const uint8_t* a77, char* call_to, char* call_de, char* extra)
 {
     call_to[0] = call_de[0] = extra[0] = '\0';
 
@@ -391,43 +393,34 @@ int unpack77_fields(const uint8_t *a77, char *call_to, char *call_de, char *extr
     return -1;
 }
 
-int unpack77(const uint8_t *a77, char *message)
+int unpack77(const uint8_t* a77, char* message)
 {
     char call_to[14];
     char call_de[14];
-    char extra[7];
+    char extra[19];
 
     int rc = unpack77_fields(a77, call_to, call_de, extra);
     if (rc < 0)
         return rc;
 
     // int msg_sz = strlen(call_to) + strlen(call_de) + strlen(extra) + 2;
-    char *dst = message;
+    char* dst = message;
 
     dst[0] = '\0';
 
     if (call_to[0] != '\0')
     {
-        dst = strcpy(dst, call_to);
-        //int dstLength2 = strlen(dst);
-        //printf("dstLength2 is %d", dstLength2);
-        //dst = dst + dstLength2; //can't sure stpcpy so need to find location of null terminator
-        dst += strlen(dst);
-        //printf("line 408 strcpy instead of stpcpy");
+        dst = stpcpy(dst, call_to);
         *dst++ = ' ';
     }
 
     if (call_de[0] != '\0')
     {
-        dst = strcpy(dst, call_de);
-        dst += strlen(dst);
-        //printf("line 415 strcpy instead of stpcpy");
+        dst = stpcpy(dst, call_de);
         *dst++ = ' ';
     }
 
-    dst = strcpy(dst, extra);
-    dst += strlen(dst);
-    //printf("line 420 strcpy instead of stpcpy");
+    dst = stpcpy(dst, extra);
     *dst = '\0';
 
     return 0;

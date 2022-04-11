@@ -14,4 +14,4 @@ void collect_adc();
 
 void set_rx_freq(uint32_t);
 
-void set_sideband(); //90 for usb, 270 for lsb
+void set_sideband(); // 90 for usb, 270 for lsb

@@ -1,15 +1,16 @@
-#pragma once
+#ifndef _SI5351_H
+#define _SI5351_H
 /*
  * si5351.h
  *
  * Created: March 2021
  * Author: Arjan
  *
- * See si5351.c for more information 
+ * See si5351.c for more information
  *
- */ 
+ */
 
-//Github link: https://github.com/ArjanteMarvelde/uSDR-pico
+// GitHub link: https://github.com/ArjanteMarvelde/uSDR-pico
 
 typedef struct
 {
@@ -31,3 +32,4 @@ void si_evaluate(void);
 #define SI_DECFREQ(i, d)	if ((((i)>=0)&&((i)<2))&&((vfo[(i)].freq)>(d))) { (vfo[(i)].freq) -= (d); vfo[(i)].flag = 1;}
 #define SI_SETFREQ(i, f)	if ((((i)>=0)&&((i)<2))&&((f)<150000000)) { vfo[(i)].freq = (f); vfo[(i)].flag = 1;}
 #define SI_SETPHASE(i, p)	if (((i)>=0)&&((i)<2)) {vfo[(i)].phase = ((uint8_t)p)&3; vfo[(i)].flag = 1;}
+#endif /* _SI5351_H */
