@@ -1,0 +1,2 @@
+dummy:
+	g++ -DPC=1 ft8/*.c ft8/*.cpp fft/*.c ft8/common/*.c -lm -Ift8 -I. -o pc
